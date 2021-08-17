@@ -1,16 +1,17 @@
-# This is a sample Python script.
+import requests
+from bs4 import BeautifulSoup
 
-# Press Maj+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+#url = 'http://localhost:4200/camps'
+url = 'https://meteo.francetvinfo.fr/france/ile-de-france/bobigny_93000'
+response = requests.get(url)
+
+if response.ok:
+    soup = BeautifulSoup(response.text, 'html.parser')
+    tempSoiree = soup.find('ul', {'class': 'forecast-details'}).find('li', {'class': 'evening'}).find('div', {'class': 'forecast big'}).find('span', {'class': 'temparature'})
+
+    print(tempSoiree.)
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+else:
+    print(response)
 
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
