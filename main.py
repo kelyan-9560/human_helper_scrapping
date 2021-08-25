@@ -1,24 +1,47 @@
 import requests
 from bs4 import BeautifulSoup
 
+ville = 'bordeaux'
+filename = 'data.txt'
 
-# url = 'http://localhost:4200/camps'
-# url = 'https://meteo.francetvinfo.fr/france/ile-de-france/bobigny_93000'
 
-
-def print_data(datas, hour, temp):
-    if hour is not None :
+def check_data(datas, hour, temp):
+    if hour is not None:
         if temp is not None:
             datas[hour] = temp
 
 
+def headers():
+    with open(filename, 'w') as file:
+        file.write('--------------------------------')
+        file.write('Informations concernant les températures de nuit de la ville de : ' + ville)
+        file.write('--------------------------------')
 
-def write_in_file(filename, datas):
+
+def find_key(v, datas):
+    for k, val in datas.items():
+        if v == val:
+            return k
+    return "Clé n'existe pas"
+
+
+def extreme_cold(datas):
+    with open(filename, 'w') as file:
+        file.write('--------------------------------')
+        file.write('!!! Opération Grand Froid !!!')
+
+        for key, value in datas.items():
+            tempMin = min(value)
+
+        file.write('Pique de froid : ' + tempMin)
+        file.write('Heure : ' + find_key(tempMin, datas))
+        file.write('--------------------------------')
+
+
+def write_in_file(datas):
     with open(filename, 'w') as file:
         for key, value in datas.items():
             file.write('[' + key.text + ':' + value.text + ']' + '\n')
-
-
 
 
 def meteo(ville):
@@ -42,9 +65,14 @@ def meteo(ville):
             temp = li.find('dd', {'class': 'temp'})
             tabTemps.append(temp)
 
-            print_data(datas, hour, temp)
+            check_data(datas, hour, temp)
 
-        write_in_file('data.txt', datas)
+        with open(filename, 'w') as file:
+            file.write('coucou')
+
+        headers()
+        extreme_cold(datas)
+        write_in_file(datas)
 
         print(tabHours)
         print(tabTemps)
@@ -54,5 +82,4 @@ def meteo(ville):
         print(response)
 
 
-test = 'ermont'
-meteo(test)
+meteo(ville)
