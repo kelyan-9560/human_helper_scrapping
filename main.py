@@ -1,21 +1,17 @@
 import requests
 from bs4 import BeautifulSoup
+import os
 
-ville = 'paris'
-filename = 'data.txt'
-
+def header():
+    with open(filename, 'w') as file:
+        file.write('---------------')
+        file.write('Informations concernant les températures de nuit de la city de : ' + city)
+        file.write('---------------' + '\n')
 
 def check_data(datas, hour, temp):
     if hour is not None:
         if temp is not None:
             datas[hour] = temp
-
-
-def header():
-    with open(filename, 'w') as file:
-        file.write('---------------')
-        file.write('Informations concernant les températures de nuit de la ville de : ' + ville)
-        file.write('---------------' + '\n')
 
 
 def find_key(v, datas):
@@ -42,12 +38,16 @@ def write_in_file(datas):
     with open(filename, 'a') as file:
         for key, value in datas.items():
             file.write('[' + key.text + ':' + value.text + ']' + '\n')
+    #test si le fichier est vide
+    if os.path.getsize(filename) == 0:
+        return False
+    return True
 
 
-def meteo(ville):
-    ville.lower()
+def meteo(city):
+    city.lower()
 
-    url = 'https://www.xn--mto-bmab.fr/' + ville
+    url = 'https://www.xn--mto-bmab.fr/' + city
     response = requests.get(url)
 
     datas = {}
@@ -69,19 +69,28 @@ def meteo(ville):
 
         header()
 
+        #affichage 'Grand Froid' si la temp en dessous de 5
         for value in datas.values():
             if value is not None:
                 valueSplit = value.text.replace('°', '')
                 if int(valueSplit) < 5:
                     extreme_cold(datas)
-        write_in_file(datas)
 
-        print(tabHours)
-        print(tabTemps)
-        print(datas)
-
+        if write_in_file(datas):
+            print('Fin du traitement')
+            print('Fichier enregisté à l\'emplacement du script')
+        else:
+            print('Erreur')
     else:
         print(response)
 
 
-meteo(ville)
+############### Main ###############
+
+city = input('Entrez le nom de la ville en minuscule : ')
+
+file = input('Entrez le nom dans lequel vous voulez ranger les informations (sans l\'extension): ')
+
+filename = file + '.txt'
+
+meteo(city)
