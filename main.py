@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-ville = 'bordeaux'
+ville = 'paris'
 filename = 'data.txt'
 
 
@@ -11,11 +11,11 @@ def check_data(datas, hour, temp):
             datas[hour] = temp
 
 
-def headers():
+def header():
     with open(filename, 'w') as file:
-        file.write('--------------------------------')
+        file.write('---------------')
         file.write('Informations concernant les températures de nuit de la ville de : ' + ville)
-        file.write('--------------------------------')
+        file.write('---------------' + '\n')
 
 
 def find_key(v, datas):
@@ -26,20 +26,20 @@ def find_key(v, datas):
 
 
 def extreme_cold(datas):
-    with open(filename, 'w') as file:
-        file.write('--------------------------------')
-        file.write('!!! Opération Grand Froid !!!')
+    with open(filename, 'a') as file:
+        file.write('--------------------------------' + '\n')
+        file.write('!!! Opération Grand Froid !!!' + '\n')
 
         for key, value in datas.items():
             tempMin = min(value)
 
-        file.write('Pique de froid : ' + tempMin)
-        file.write('Heure : ' + find_key(tempMin, datas))
-        file.write('--------------------------------')
+        file.write('Pique de froid : ' + tempMin + '\n')
+        file.write('Heure : ' + find_key(tempMin, datas) + '\n')
+        file.write('--------------------------------' + '\n')
 
 
 def write_in_file(datas):
-    with open(filename, 'w') as file:
+    with open(filename, 'a') as file:
         for key, value in datas.items():
             file.write('[' + key.text + ':' + value.text + ']' + '\n')
 
@@ -67,11 +67,13 @@ def meteo(ville):
 
             check_data(datas, hour, temp)
 
-        with open(filename, 'w') as file:
-            file.write('coucou')
+        header()
 
-        headers()
-        extreme_cold(datas)
+        for value in datas.values():
+            if value is not None:
+                valueSplit = value.text.replace('°', '')
+                if int(valueSplit) < 5:
+                    extreme_cold(datas)
         write_in_file(datas)
 
         print(tabHours)
